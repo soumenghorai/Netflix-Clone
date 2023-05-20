@@ -10,7 +10,7 @@ import axios from "axios";
 import { onAuthStateChanged } from "firebase/auth";
 import { firebaseAuth } from "../utils/firebase-config";
 import { useDispatch } from "react-redux";
-// import { removeMovieFromLiked } from "../store";
+import { removeMovieFromLiked } from "../store";
 import video from "../asset/video.mp4";
 
 export default React.memo(function Card({ index, movieData, isLiked = false }) {
@@ -77,12 +77,12 @@ export default React.memo(function Card({ index, movieData, isLiked = false }) {
                 <RiThumbDownFill title="Dislike" />
                 {isLiked ? (
                   <BsCheck
-                    // title="Remove from List"
-                    // onClick={() =>
-                    //   dispatch(
-                    //     removeMovieFromLiked({ movieId: movieData.id, email })
-                    //   )
-                    // }
+                    title="Remove from List"
+                    onClick={() =>
+                      dispatch(
+                        removeMovieFromLiked({ movieId: movieData.id, email })
+                      )
+                    }
                   />
                 ) : (
                   <AiOutlinePlus title="Add to my list" onClick={addToList} />

@@ -6,11 +6,13 @@ import { firebaseAuth } from '../utils/firebase-config';
 import styled from 'styled-components';
 import Navbar from '../components/Navbar';
 import Slider from '../components/Slider';
+import CardSlider from '../components/CardSlider';
 import NotAvailable from '../components/NotAvailable';
 import { onAuthStateChanged } from 'firebase/auth';
 import SelectGenre from '../components/SelectGenre';
 
-function Movies() {
+
+function MoviePage() {
   const [isScrolled, setIsScrolled] = useState(false);
   const movies = useSelector((state) => state.netflix.movies);
   const genres = useSelector((state) => state.netflix.genres);
@@ -19,41 +21,43 @@ function Movies() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  useEffect(()=> {
+  useEffect(() => {
     dispatch(getGenres());
   }, []);
 
-  useEffect(()=> {
-    if(genresLoaded) dispatch(fetchMovies({ type: "movies" }));
+  useEffect(() => {
+    if (genresLoaded) {
+      dispatch(fetchMovies({ genres, type: "movie" }));
+    }
   }, [genresLoaded]);
+
+  const [user, setUser] = useState(undefined);
+
+  onAuthStateChanged(firebaseAuth, (currentUser) => {
+    if (currentUser) setUser(currentUser.uid);
+    else navigate("/login");
+  });
 
   window.onscroll = () => {
     setIsScrolled(window.pageYOffset === 0 ? false : true);
     return () => (window.onscroll = null);
   };
 
-  onAuthStateChanged(firebaseAuth, (currentUser) => {
-    // if (currentUser) navigate("/");
-  });
-
   return (
     <Container>
-        <div className="navbar">
-            <Navbar isScrolled={isScrolled} />
-        </div>
-        <div className="data">
-        <SelectGenre genres={genres} type="movie"/>
-            {
-                movies.length ? <Slider movies={movies} /> :
-                <NotAvailable />
-            }
-        </div>
+      <div className="navbar">
+        <Navbar isScrolled={isScrolled} />
+      </div>
+      <div className="data">
+        <SelectGenre genres={genres} type="movie" />
+        {movies.length ? <Slider movies={movies} /> : <NotAvailable />}
+      </div>
     </Container>
-  )
+  );
 }
 
 const Container = styled.div`
-.data {
+  .data {
     margin-top: 8rem;
     .not-available {
       text-align: center;
@@ -62,5 +66,4 @@ const Container = styled.div`
     }
   }
 `;
-
-export default Movies
+export default MoviePage;
